@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
- 
+
 var UserSchema = new mongoose.Schema({
     id_card:{
         thaiFullName : String,
@@ -26,7 +26,6 @@ var UserSchema = new mongoose.Schema({
     authentication:{
         username : {
             type:String,
-            unique: true,
         },
         password : String,
     },
@@ -66,5 +65,5 @@ var UserSchema = new mongoose.Schema({
 },{
         timestamps: true
 });
- 
+
 module.exports = mongoose.model('user', UserSchema);

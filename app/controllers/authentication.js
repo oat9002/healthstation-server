@@ -2,8 +2,8 @@ var jwt = require('jsonwebtoken');
 var ObjectId = require('mongodb').ObjectID;
 // var User = require('../models/user');
 var User = require('../models/user_model');
+var Username = require('../models/username')
 var config = require('../../configs/develop');
-var Role = require('../models/role');
 
 function generateToken(user){
     info = {
@@ -55,7 +55,7 @@ exports.register = function(req, res, next){ // register
                     return next(err);
                 }
                 if(existingUser){
-                    res.status(422).send({error: 'this id number is already exist'});
+                    res.status(409).send({error: 'this id number is already exist'});
                     return next(err);
                 }
                 birth_date = new Date(info.birthOfDate);
@@ -120,15 +120,26 @@ exports.firsttimeChanged = function(req, res, next){
                 res.status(500).send({err:'MongoDB cannot find this user'});
                 return next(err);
             }
-            existingUser.authentication = {
-                username : info.username,
-                password : info.password
-            };
-            existingUser.firsttime = false;
-            existingUser.markModified('authentication');
-            existingUser.markModified('firsttime');
-            existingUser.save();
-            return res.status(200).json({err:false, message:'Update success'})
+            var username = new Username({
+                username : info.username
+            });
+
+            username.findOne(username, function(err, username){
+                if(username){
+                    res.status(409).send({error:true, message: 'Already existed username'});
+                    return next(err);
+                }
+                username.save()
+                existingUser.authentication = {
+                    username : info.username,
+                    password : info.password
+                };
+                existingUser.firsttime = false;
+                existingUser.markModified('authentication');
+                existingUser.markModified('firsttime');
+                existingUser.save();
+                return res.status(200).send({err:false, message:'Update success'})
+            })
         });
     }else{
         return res.status(406).send({error:'Missing field in json'});
