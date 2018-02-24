@@ -4,11 +4,11 @@ var mongoose = require('mongoose');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var cors = require('cors');
- 
-var databaseConfig = require('./config/develop');
+
+var databaseConfig = require('./configs/develop');
 var router = require('./app/routes');
 
-mongoose.Promise = global.Promise; 
+mongoose.Promise = global.Promise;
 mongoose.connect(databaseConfig.databaseUrl);
 
 app.listen(process.env.PORT || 8080);
@@ -18,5 +18,5 @@ app.use(bodyParser.urlencoded({ extended: false })); // Parses urlencoded bodies
 app.use(bodyParser.json()); // Send JSON responses
 app.use(logger('dev')); // Log requests to API using morgan
 app.use(cors());
- 
+
 router(app);

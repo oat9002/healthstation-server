@@ -1,7 +1,7 @@
 var Data = require('../models/healthdata');
 var User = require('../models/user_model');
 var ObjectId = require('mongodb').ObjectID;
-var jwt = require('jsonwebtoken'); 
+var jwt = require('jsonwebtoken');
 
 exports.insertData = function(req, res, next){ //save
         var doc = req.body;
@@ -15,7 +15,6 @@ exports.insertData = function(req, res, next){ //save
                                 return res.status(500).send({error: 'Internal server error due to : '+err});
                         }
                         if(!existingUser){
-                        // console.log("mee u law");
                                 return res.status(404).send({error: 'Cannot find this user.'});
                         }
                         if(doc.body_temperature){
@@ -23,7 +22,7 @@ exports.insertData = function(req, res, next){ //save
                                         uid : user_id,
                                         h_value : doc.body_temperature.value,
                                         unit : doc.body_temperature.unit,
-                                        type : "Temperature",
+                                        type : "temperature",
                                         date_time : doc.effective_time_frame.date_time
                                 }
                         }else if(doc.systolic_blood_pressure && doc.diastolic_blood_pressure){
@@ -32,7 +31,7 @@ exports.insertData = function(req, res, next){ //save
                                         h_value : doc.systolic_blood_pressure.value,
                                         l_value : doc.diastolic_blood_pressure.value,
                                         unit : doc.systolic_blood_pressure.unit,
-                                        type : "Bloodpressure",
+                                        type : "bloodpressure",
                                         date_time : doc.effective_time_frame.date_time
                                 }
                         }else if(doc.body_weight){
@@ -40,7 +39,7 @@ exports.insertData = function(req, res, next){ //save
                                         uid : user_id,
                                         h_value : doc.body_weight.value,
                                         unit : doc.body_weight.unit,
-                                        type : "Weight",
+                                        type : "weight",
                                         date_time : doc.effective_time_frame.date_time
                                 }
                         }else if(doc.body_height){
@@ -48,7 +47,7 @@ exports.insertData = function(req, res, next){ //save
                                         uid : user_id,
                                         h_value : doc.body_height.value,
                                         unit : doc.body_height.unit,
-                                        type : "Height",
+                                        type : "height",
                                         date_time : doc.effective_time_frame.date_time
                                 }
                         }else if(doc.heart_rate){
@@ -56,7 +55,7 @@ exports.insertData = function(req, res, next){ //save
                                         uid : user_id,
                                         h_value : doc.heart_rate.value,
                                         unit : doc.heart_rate.unit,
-                                        type : "Heartrate",
+                                        type : "heartrate",
                                         date_time : doc.effective_time_frame.date_time
                                 }
                         }else{
@@ -77,13 +76,95 @@ exports.insertData = function(req, res, next){ //save
                                         }
                                         return res.status(500).send({error: 'Internal server error due to : ' +err});
                                 }
-        
+
                                 return res.status(201).send({error: false})
-        
+
                         });
                 });
         }
 }
+
+// exports.saveHealthdata = function(req, res, next){ //save
+//         var doc = req.body;
+//         var user_id = req.headers['user_id'];
+//         if(!user_id){
+//                 return res.status(400).send({error: 'Missing require header'});
+//         }else{
+//                 User.findOne({_id: ObjectId(user_id)}, function(err, existingUser){
+//                         var arr = {};
+//                         if(err){
+//                                 return res.status(500).send({error: 'Internal server error due to : '+err});
+//                         }
+//                         if(!existingUser){
+//                                 return res.status(404).send({error: 'Cannot find this user.'});
+//                         }
+//                         for
+//                         if(doc.body_temperature){
+//                                 arr = {
+//                                         uid : user_id,
+//                                         h_value : doc.body_temperature.value,
+//                                         unit : doc.body_temperature.unit,
+//                                         type : "Temperature",
+//                                         date_time : doc.effective_time_frame.date_time
+//                                 }
+//                         }else if(doc.systolic_blood_pressure && doc.diastolic_blood_pressure){
+//                                 arr = {
+//                                         uid : user_id,
+//                                         h_value : doc.systolic_blood_pressure.value,
+//                                         l_value : doc.diastolic_blood_pressure.value,
+//                                         unit : doc.systolic_blood_pressure.unit,
+//                                         type : "Bloodpressure",
+//                                         date_time : doc.effective_time_frame.date_time
+//                                 }
+//                         }else if(doc.body_weight){
+//                                 arr = {
+//                                         uid : user_id,
+//                                         h_value : doc.body_weight.value,
+//                                         unit : doc.body_weight.unit,
+//                                         type : "Weight",
+//                                         date_time : doc.effective_time_frame.date_time
+//                                 }
+//                         }else if(doc.body_height){
+//                                 arr = {
+//                                         uid : user_id,
+//                                         h_value : doc.body_height.value,
+//                                         unit : doc.body_height.unit,
+//                                         type : "Height",
+//                                         date_time : doc.effective_time_frame.date_time
+//                                 }
+//                         }else if(doc.heart_rate){
+//                                 arr = {
+//                                         uid : user_id,
+//                                         h_value : doc.heart_rate.value,
+//                                         unit : doc.heart_rate.unit,
+//                                         type : "Heartrate",
+//                                         date_time : doc.effective_time_frame.date_time
+//                                 }
+//                         }else{
+//                                 return res.status(400).send({error : 'Data schema error'});
+//                         }
+//                         var data = new Data({
+//                                 uid : arr.uid,
+//                                 h_value : arr.h_value,
+//                                 l_value : arr.l_value,
+//                                 unit : arr.unit,
+//                                 type : arr.type,
+//                                 date_time : arr.date_time
+//                         })
+//                         data.save(function(err, data){
+//                                 if(err){
+//                                         if(err.code==11000){
+//                                                 return res.status(406).send({error: 'Duplicate data'});
+//                                         }
+//                                         return res.status(500).send({error: 'Internal server error due to : ' +err});
+//                                 }
+
+//                                 return res.status(201).send({error: false})
+
+//                         });
+//                 });
+//         }
+// }
 
 exports.getLatestData = function(req, response, next){ //get latest data of all data type
         var user_id = req.headers['user_id'];

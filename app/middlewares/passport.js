@@ -1,13 +1,13 @@
 var passport = require('passport');
 
 var User = require('../models/user_model');
-var config = require('../../config/develop');
+var config = require('../../configs/develop');
 var JwtStrategy = require('passport-jwt').Strategy;
 var ExtractJwt = require('passport-jwt').ExtractJwt;
 var LocalStrategy = require('passport-local').Strategy;
 var BasicStrategy = require('passport-http').BasicStrategy
 // var FacebookStrategy = require('passport-facebook').Strategy;
- 
+
 var basicOptions = {
     usernameField: 'username',
     passwordField: 'password',
@@ -22,7 +22,7 @@ var basicLogin = new BasicStrategy(basicOptions, function(req, username, passwor
         if(!user){
             return done(null, false, {message: 'Login failed. Please try again.'});
         }
-        
+
         if(password===user.authentication.password){
             return done(null, user);
         }else{
@@ -31,12 +31,12 @@ var basicLogin = new BasicStrategy(basicOptions, function(req, username, passwor
     });
 
 });
- 
+
 var jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeader(),
     secretOrKey: config.secret
 };
- 
+
 var jwtLogin = new JwtStrategy(jwtOptions, function(payload, done){
     User.findById(payload._id, function(err, user){
         if(err){
@@ -51,11 +51,11 @@ var jwtLogin = new JwtStrategy(jwtOptions, function(payload, done){
         } else {
             done(null, false);
         }
- 
+
     });
- 
+
 });
- 
+
 passport.use(jwtLogin);
 passport.use(basicLogin);
 
@@ -67,14 +67,14 @@ passport.use(basicLogin);
 
 // var localLogin = new LocalStrategy( function(username, password, done) {
 //     User2.findOne({ username: username }, function (err, user) {
-//         if (err) { 
-//           return done(err); 
+//         if (err) {
+//           return done(err);
 //         }
-//         if (!user) { 
-//             return done(null, false); 
+//         if (!user) {
+//             return done(null, false);
 //         }
 //         if (!user.verifyPassword(password)) {
-//             return done(null, false); 
+//             return done(null, false);
 //         }
 //         return done(null, user);
 //     });
@@ -85,17 +85,17 @@ passport.use(basicLogin);
 //     User2.findOne({
 //         idNumber: idNumber
 //     }, function(err, user){
- 
+
 //         if(err){
 //             return done(err);
 //         }
- 
+
 //         if(!user){
 //             return done(null, false, {error: 'Login failed. Please try again.'});
 //         }
 //         return done(null, user);
 //     });
- 
+
 // });
 
 // module.exports = function(passport) {
@@ -111,7 +111,7 @@ passport.use(basicLogin);
 //             done(err, user);
 //         });
 //     });
-    
+
 //     // code for login (use('local-login', new LocalStategy))
 //     // code for signup (use('local-signup', new LocalStategy))
 
@@ -149,8 +149,8 @@ passport.use(basicLogin);
 //                     var newUser            = new User();
 
 //                     // set all of the facebook information in our user model
-//                     newUser.facebook.id    = profile.id; // set the users facebook id                   
-//                     newUser.facebook.token = token; // we will save the token that facebook provides to the user                    
+//                     newUser.facebook.id    = profile.id; // set the users facebook id
+//                     newUser.facebook.token = token; // we will save the token that facebook provides to the user
 //                     newUser.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName; // look at the passport user profile to see how names are returned
 //                     newUser.facebook.email = profile.emails[0].value; // facebook can return multiple emails so we'll take the first
 

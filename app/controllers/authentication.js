@@ -1,10 +1,10 @@
-var jwt = require('jsonwebtoken');  
+var jwt = require('jsonwebtoken');
 var ObjectId = require('mongodb').ObjectID;
 // var User = require('../models/user');
 var User = require('../models/user_model');
-var config = require('../../config/develop');
+var config = require('../../configs/develop');
 var Role = require('../models/role');
- 
+
 function generateToken(user){
     info = {
         _id: user._id,
@@ -22,7 +22,7 @@ exports.protected = function(req, res, next){
         firsttime: req.user.firsttime
     });
 }
- 
+
 exports.login = function(req, res, next){
     if(req.user.role==="patient"){
         var userInfo = setPatientInfo(req.user);
@@ -37,15 +37,15 @@ exports.login = function(req, res, next){
             user: userInfo
         });
     }
- 
+
 }
 
-exports.register = function(req, res, next){ // register 
+exports.register = function(req, res, next){ // register
     var info = req.body;
     var type = req.headers['register-type'];
     var idNumber = info.idNumber;
     if(!idNumber){
-        return res.status(422).send({error: 'Missing Id number'}); 
+        return res.status(422).send({error: 'Missing Id number'});
     }
     if(type=="idcard"){
         if(info.thaiFullName && info.engFullName && info.birthOfDate && info.address && info.idNumber && info.gender){
@@ -80,7 +80,7 @@ exports.register = function(req, res, next){ // register
                 });
 
                 user.save(function(err, user){
-        
+
                     if(err){
                         res.status(502).send({error: 'MongoDB cannot connect'});
                         return next(err);
@@ -112,7 +112,7 @@ exports.firsttimeChanged = function(req, res, next){
     var info = req.body;
     var _id = req.headers['_id'];
     if(!_id){
-        return res.status(422).send({error: 'Missing require headers'});     
+        return res.status(422).send({error: 'Missing require headers'});
     }
     if(info.username && info.password){
         User.findOne({"_id": ObjectId(_id)}, function(err, existingUser){
@@ -139,23 +139,23 @@ exports.firsttimeChanged = function(req, res, next){
 exports.roleAuthorization = function(roles){ // manage user role
     return function(req, res, next){
         var user = req.user;
- 
+
         User.findById(user._id, function(err, foundUser){
- 
+
             if(err){
                 res.status(422).json({error: 'No user found.'});
                 return next(err);
             }
- 
+
             if(roles.indexOf(foundUser.role) > -1){
                 return next();
             }
- 
+
             res.status(401).json({error: 'You are not authorized to view this content'});
             return next('Unauthorized');
- 
+
         });
- 
+
     }
 }
 
@@ -186,4 +186,8 @@ function setPatientInfo(request){
         about_patient : request.about_patient,
         firsttime : request.firsttime,
     };
+}
+
+function getUserById(req, res, next){
+
 }

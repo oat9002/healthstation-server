@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
- 
+
 var HealthcareProvider = new mongoose.Schema({
     name : {
         type:String,
@@ -11,13 +11,9 @@ var HealthcareProvider = new mongoose.Schema({
         type:String,
         require : true
     },
-    phones:[
+    phones:[String],
+    patients:[
         {
-            phone : String
-        }
-    ],
-    patient_list:[
-        { 
             patient_id : String,
             patient_name : String,
             agreement : {
@@ -26,7 +22,7 @@ var HealthcareProvider = new mongoose.Schema({
             }
         }
     ],
-    docter_list:[
+    docters:[
         {
             doctor_id : String,
             doctor_name : String,
@@ -36,8 +32,9 @@ var HealthcareProvider = new mongoose.Schema({
             }
         }
     ],
+    stations:[String]
 },{
         timestamps: true
 });
- 
+
 module.exports = mongoose.model('provider', HealthcareProvider);
