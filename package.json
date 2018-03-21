@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test" : "nodemon server.js"
+    "test": "nodemon server.js"
   },
   "author": "Rattapum Puttaraksa <chok.puttaraksa@gmail.com>",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "jsonwebtoken": "^7.1.9",
     "mongoose": "^4.6.3",
     "morgan": "^1.7.0",
+    "nodemon": "^1.17.2",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
     "passport-jwt": "^2.1.0",

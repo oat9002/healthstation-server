@@ -1,7 +1,8 @@
 var passport = require('passport');
 
-var User = require('../models/user_model');
-var config = require('../../configs/develop');
+var User = require('../models/user');
+    Provider = require('../models/provider')
+var config = require('../../configs');
 var JwtStrategy = require('passport-jwt').Strategy;
 var ExtractJwt = require('passport-jwt').ExtractJwt;
 var LocalStrategy = require('passport-local').Strategy;
@@ -16,6 +17,24 @@ var basicOptions = {
 
 var basicLogin = new BasicStrategy(basicOptions, function(req, username, password, done) {
     User.findOne({"authentication.username": username}, function(err, user){
+        if(err){
+            return done(null, false, {message:err});
+        }
+        if(!user){
+            return done(null, false, {message: 'Login failed. Please try again.'});
+        }
+
+        if(password===user.authentication.password){
+            return done(null, user);
+        }else{
+            return done(null, false, {message:'Wrong password'});
+        }
+    });
+
+});
+
+var providerBasicLogin = new BasicStrategy(basicOptions, function(req, username, password, done) {
+    Provider.findOne({"authentication.username": username}, function(err, user){
         if(err){
             return done(null, false, {message:err});
         }
@@ -57,7 +76,9 @@ var jwtLogin = new JwtStrategy(jwtOptions, function(payload, done){
 });
 
 passport.use(jwtLogin);
-passport.use(basicLogin);
+passport.use('providerBasicLogin', providerBasicLogin);
+passport.use('basicLogin', basicLogin);
+
 
 
 // var localOptions = {
@@ -81,7 +102,6 @@ passport.use(basicLogin);
 // });
 
 // var localLogin = new LocalStrategy(localOptions, function(idNumber, password, done){
-//     // console.log(email);
 //     User2.findOne({
 //         idNumber: idNumber
 //     }, function(err, user){

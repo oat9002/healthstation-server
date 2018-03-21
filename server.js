@@ -5,7 +5,7 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 
-var databaseConfig = require('./configs/develop');
+var databaseConfig = require('./configs');
 var router = require('./app/routes');
 
 mongoose.Promise = global.Promise;

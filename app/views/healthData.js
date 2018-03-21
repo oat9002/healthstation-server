@@ -1,5 +1,5 @@
 var Data = require('../models/healthdata');
-var User = require('../models/user_model');
+var User = require('../models/user');
 var ObjectId = require('mongodb').ObjectID;
 var jwt = require('jsonwebtoken');
 
@@ -307,6 +307,7 @@ exports.findPeriodDataByType = function (req, res, next) { // find 1 data by typ
         });
     } else {
         findDataByPeriod(user_id, type, period, function (err, resp) {
+
             if (err) {
                 return res.status(500).send({
                     error: 'Internal server error'
@@ -433,7 +434,6 @@ function findDataByPeriod(user_id, type, period, callback) {
         end.setHours(0);
         end.setMinutes(0);
     }
-    console.log(start + " : " + end)
 
     Data.find({
         "uid": user_id,

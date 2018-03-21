@@ -1,4 +1,4 @@
-var User = require('../models/user_model');
+var User = require('../models/user');
 var ObjectId = require('mongodb').ObjectID;
 
 exports.profileChanging = function(req, res, next){
@@ -6,7 +6,7 @@ exports.profileChanging = function(req, res, next){
     var _id = req.headers['_id'];
     console.log(info);
     if(!_id){
-        return res.status(422).send({error: 'Missing require headers'});     
+        return res.status(422).send({error: 'Missing require headers'});
     }
     if(Object.keys(info).length == 0){
         return res.status(422).send({error: 'Missing body'});

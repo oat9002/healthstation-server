@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
+const configs = require('../../configs')
 
 var UserSchema = new mongoose.Schema({
     id_card:{
@@ -18,10 +19,6 @@ var UserSchema = new mongoose.Schema({
             type: String,
             unique: true,
         },
-    },
-    finger_print : {
-        key1 : String,
-        key2 : String
     },
     authentication:{
         username : {
@@ -67,3 +64,14 @@ var UserSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('user', UserSchema);
+
+UserSchema.pre('save', function (next) {
+    var user = this;
+    bcrypt.hash(user.authentication.password, configs.hashSalt, function (err, hash){
+      if (err) {
+        return next(err);
+      }
+      user.password = hash;
+      next();
+    })
+  });
