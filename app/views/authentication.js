@@ -83,7 +83,7 @@ exports.register = function(req, res, next){ // register ID_CARD
     if(station_key){
         Station.findOne({"_id": ObjectId(station_key)}, (err, station)=>{
             if(err){
-                res.status(500).send({err:'MongoDB cannot find this user'});
+                res.status(400).send({err:err.message});
                     return next(err);
             }
 
@@ -115,7 +115,7 @@ exports.register = function(req, res, next){ // register ID_CARD
                             },
                             authentication:{
                                 username : info.idNumber,
-                                password : birth_date.getDate()+""+(birth_date.getMonth()+1)+""+(birth_date.getFullYear()+543)
+                                password : ("0" + birth_date.getDate()).slice(-2)+""+("0" + (birth_date.getMonth() + 1)).slice(-2)+""+(birth_date.getFullYear()+543)
                             },
                             firsttime: true,
                             role : info.role
@@ -202,36 +202,44 @@ exports.register_finger_print = function(req, res, next){ // register FINGER_PRI
 
 exports.firsttimeChanged = function(req, res, next){
     var info = req.body;
-    var _id = req.headers['_id'];
-    if(!_id){
+    var key = req.headers['x-user-key'];
+    if(!key){
         return res.status(422).send({error: 'Missing require headers'});
     }
     if(info.username && info.password){
-        User.findOne({"_id": ObjectId(_id)}, function(err, existingUser){
+        User.findOne({"_id": ObjectId(key)}, function(err, existingUser){
             if(err){
                 res.status(500).send({err:'MongoDB cannot find this user'});
                 return next(err);
             }
-            var username = new Username({
-                username : info.username
-            });
-
-            username.findOne(username, function(err, username){
-                if(username){
-                    res.status(409).send({error:true, message: 'Already existed username'});
+            Username.findOne({'username': info.username}, (err, existed)=>{
+                if(err){
+                    res.status(400).send({error:true, message: err});
                     return next(err);
                 }
-                username.save()
-                existingUser.authentication = {
-                    username : info.username,
-                    password : info.password
-                };
-                existingUser.firsttime = false;
-                existingUser.markModified('authentication');
-                existingUser.markModified('firsttime');
-                existingUser.save();
-                return res.status(200).send({err:false, message:'Update success'})
-            })
+                if(existed){
+                    res.status(400).send({error:true, message: "Username's already existed"});
+                    return next(err);
+                }
+                username =  new Username({
+                    username : info.username
+                });
+                username.save((save_err, result)=>{
+                    if(save_err){
+                        res.status(400).send({error:true, message: save_err});
+                        return next(save_err);
+                    }
+                    existingUser.authentication = {
+                        username : info.username,
+                        password : info.password
+                    };
+                    existingUser.firsttime = false;
+                    existingUser.markModified('authentication');
+                    existingUser.markModified('firsttime');
+                    existingUser.save();
+                    return res.status(200).send({err:false, message:'Update success'})
+                });
+            });
         });
     }else{
         return res.status(400).send({error:'Missing field in json'});
