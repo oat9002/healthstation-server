@@ -67,6 +67,59 @@ exports.finger_print_login = function(req, res, next){
         return res.status(400).send({error: 'Missing require header(s).'});
     }
 }
+
+exports.register_finger_print = function(req, res, next){ // register FINGER_PRINT
+    var info = req.body;
+    var station_key = req.headers['x-station-key'];
+    var provider_key =  req.headers['x-provider-key'];
+
+    if(station_key && provider_key){
+        query_dict = {
+            "_id":ObjectId(station_key),
+            "provider":ObjectId(provider_key)
+        };
+        Station.findOne(query_dict, (err, station)=>{
+            if(err){
+                res.status(500).send({err:'MongoDB cannot find this user'});
+                return next(err);
+            }
+            if(station && station.active){
+                if(info.fingerPrint && info.userId){
+                    User.findOne({"_id":ObjectId(info.userId)}, (err, existed)=>{
+                        if(err){
+                            res.status(500).send({err:'MongoDB cannot find this user'});
+                            return next(err);
+                        }
+                        if(existed){
+                            var finger_print = new FingerPrint({
+                                finger_print: info.fingerPrint,
+                                user: existed._id
+                            })
+                            finger_print.save((err, user)=>{
+
+                                if(err){
+                                    res.status(400).send({error: err.message});
+                                    return next(err);
+                                }
+                                res.status(201).send({error:false});
+                            });
+                        }else{
+                            return res.status(404).send({error: 'Cannot find user'});
+                        }
+                    })
+                }else{
+                    return res.status(400).send({error : 'Missing field in json'});
+                }
+            }else{
+                return res.status(404).send({error: 'Cannot find station'});
+            }
+        })
+    }else{
+        return res.status(400).send({error: 'Missing require header(s).'});
+    }
+}
+
+
 function generateToken(user){
     info = {
         _id: user._id,

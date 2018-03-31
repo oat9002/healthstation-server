@@ -171,6 +171,8 @@ first time login:
 Header:
 ```
     Authorization: Basic Authen of user username and password
+    x-station-key: {{PROVIDER_KEY}}
+    x-provider-key: {{STATION_KEY}}
 ```
 
 Response body

@@ -33,6 +33,27 @@ var basicLogin = new BasicStrategy(basicOptions, function(req, username, passwor
 
 });
 
+var stationBasicLogin = new BasicStrategy(basicOptions, function(req, username, password, done) {
+    User.findOne({"id_card.idNumber": username}, function(err, user){
+        if(err){
+            return done(null, false, {message:err});
+        }
+        if(!user){
+            return done(null, false, {message: 'Login failed. Please try again.'});
+        }
+
+        birth_date = user.id_card.birthOfDate
+        user_password = ("0" + birth_date.getDate()).slice(-2)+""+("0" + (birth_date.getMonth() + 1)).slice(-2)+""+(birth_date.getFullYear()+543);
+
+        if(password===user_password){
+            return done(null, user);
+        }else{
+            return done(null, false, {message:'Wrong password'});
+        }
+    });
+
+});
+
 var providerBasicLogin = new BasicStrategy(basicOptions, function(req, username, password, done) {
     Provider.findOne({"authentication.username": username}, function(err, user){
         if(err){
@@ -77,6 +98,7 @@ var jwtLogin = new JwtStrategy(jwtOptions, function(payload, done){
 
 passport.use(jwtLogin);
 passport.use('providerBasicLogin', providerBasicLogin);
+passport.use('stationBasicLogin', stationBasicLogin)
 passport.use('basicLogin', basicLogin);
 
 

@@ -1,9 +1,10 @@
 var passportService = require('./middlewares/passport'),
-    AuthenticationController = require('./views/authentication'),
+    StationController = require('./views/station')
     DataController = require('./views/healthData');
     UserController = require('./views/user')
     FingerprintView = require('./views/fingerPrint')
-    ProviderAuthenController = require('./views/providerAuthen')
+    ProviderAuthenController = require('./views/provider')
+
     express = require('express'),
     passport = require('passport');
 
@@ -11,6 +12,7 @@ var requireAuth = passport.authenticate('jwt', {session: false}),
     // requireLogin = passport.authenticate('local',{session: false});
     requireLoginBasic = passport.authenticate('basicLogin', { session: false })
     requireProviderLoginBasic = passport.authenticate('providerBasicLogin', { session: false })
+    requireStationLoginBasic = passport.authenticate('stationBasicLogin', { session: false })
 
 module.exports = function(app){
 
@@ -26,13 +28,14 @@ module.exports = function(app){
     // Internal use
     authRoutes.post('/register/provider', ProviderAuthenController.provider_register);
     // Public use
-    authRoutes.post('/register/station', requireProviderLoginBasic,AuthenticationController.register_station);
-    authRoutes.post('/register/card', AuthenticationController.register);
-    authRoutes.post('/register/fingerprint', AuthenticationController.register_finger_print);
+    authRoutes.post('/register/station', requireProviderLoginBasic, StationController.register_station);
+    authRoutes.post('/register/card', UserController.register);
+    authRoutes.post('/register/fingerprint', FingerprintView.register_finger_print);
     authRoutes.get('/login/fingerprint', FingerprintView.finger_print_login);
-    authRoutes.get('/login', requireLoginBasic, AuthenticationController.login);
-    authRoutes.put('/firsttimeupdate', requireAuth, AuthenticationController.firsttimeChanged);
-    authRoutes.get('/protected', requireAuth, AuthenticationController.protected);
+    authRoutes.get('/login', requireStationLoginBasic, UserController.login);
+    authRoutes.get('/login/mobile', requireLoginBasic, UserController.mobile_login)
+    authRoutes.put('/firsttimeupdate', requireAuth, UserController.firsttimeChanged);
+    authRoutes.get('/protected', requireAuth, UserController.protected);
 
     // Data Routes
     apiRoutes.use('/data', dataRoutes);
