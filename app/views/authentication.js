@@ -27,23 +27,35 @@ exports.protected = function(req, res, next){
 }
 
 exports.login = function(req, res, next){
-    if(req.user.role==="patient"){
-        var userInfo = setPatientInfo(req.user);
-        res.status(200).json({
-            token: 'JWT ' + generateToken(userInfo),
-            user: userInfo
-        });
-    }else if(req.user.role==="doctor"){
-        var userInfo = setDoctorInfo(req.user);
-        res.status(200).json({
-            token: 'JWT ' + generateToken(userInfo),
-            user: userInfo
-        });
-    }
+    var provider_key =  req.headers['x-provider-key'];
+        station_key = req.headers['x-station-key'];
+    query_dict = {
+        "_id":ObjectId(station_key),
+        "provider":ObjectId(provider_key)
+    };
+    Station.findOne(query_dict ,(err, result)=>{
+        if(err){
+            res.status(404).send({err:err.message});
+                return next(err);
+        }
+        if(req.user.role==="patient"){
+            var userInfo = setPatientInfo(req.user);
+            res.status(200).json({
+                token: 'JWT ' + generateToken(userInfo),
+                user: userInfo
+            });
+        }else if(req.user.role==="doctor"){
+            var userInfo = setDoctorInfo(req.user);
+            res.status(200).json({
+                token: 'JWT ' + generateToken(userInfo),
+                user: userInfo
+            });
+        }
+    })
 }
 
 exports.register_station = function(req, res, next){
-    var provider_id = req.headers['x-provider'];
+    var provider_id =  req.headers['x-provider-key'];
         body = req.body;
     if(provider_id && body.name){
         Provider.findOne({"_id": ObjectId(provider_id)}, (err, provider)=>{
@@ -76,12 +88,17 @@ exports.register_station = function(req, res, next){
 exports.register = function(req, res, next){ // register ID_CARD
     var info = req.body;
     var station_key = req.headers['x-station-key'];
+    var provider_key =  req.headers['x-provider-key'];
     var idNumber = info.idNumber;
     if(!idNumber){
         return res.status(422).send({error: 'Missing Id number'});
     }
-    if(station_key){
-        Station.findOne({"_id": ObjectId(station_key)}, (err, station)=>{
+    if(station_key && provider_key){
+        query_dict = {
+            "_id":ObjectId(station_key),
+            "provider":ObjectId(provider_key)
+        };
+        Station.findOne(query_dict, (err, station)=>{
             if(err){
                 res.status(400).send({err:err.message});
                     return next(err);
@@ -156,9 +173,14 @@ exports.register = function(req, res, next){ // register ID_CARD
 exports.register_finger_print = function(req, res, next){ // register FINGER_PRINT
     var info = req.body;
     var station_key = req.headers['x-station-key'];
+    var provider_key =  req.headers['x-provider-key'];
 
-    if(station_key){
-        Station.findOne({"_id": ObjectId(station_key)}, (err, station)=>{
+    if(station_key && provider_key){
+        query_dict = {
+            "_id":ObjectId(station_key),
+            "provider":ObjectId(provider_key)
+        };
+        Station.findOne(query_dict, (err, station)=>{
             if(err){
                 res.status(500).send({err:'MongoDB cannot find this user'});
                 return next(err);

@@ -66,6 +66,7 @@ Header
 ```
     Authorization: Basic Authen of provider username and password
     X-Station-Key: {{station_key}}
+    X-Provider-Key: {{PROVIDER_KEY}}
 ```
 
 Request body
@@ -108,6 +109,7 @@ Header
 ```
     Authorization: Basic Authen of provider username and password
     X-Station-Key: {{station_key}}
+    X-Provider-Key: {{PROVIDER_KEY}}
 ```
 
 Request body
@@ -136,6 +138,7 @@ Header
 ```
     Authorization: Basic Authen of provider username and password
     X-Station-Key: {{station_key}}
+    X-Provider-Key: {{PROVIDER_KEY}}
 ```
 
 Response body
@@ -204,6 +207,7 @@ Header:
     Authorization: Basic Authen of provider username and password
     x-station-key: {{station_key}}
     x-user-key: {{user_key}}
+    X-Provider-Key: {{PROVIDER_KEY}}
 ```
 
 Response body

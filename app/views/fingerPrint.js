@@ -10,8 +10,13 @@ var config = require('../../configs');
 
 exports.get_finger_print = function(req, res, next){
     var station_key = req.headers['x-station-key'];
-    if(station_key){
-        Station.findOne({"_id": ObjectId(station_key)}, (err, station)=>{
+    var provider_key =  req.headers['x-provider-key'];
+    if(station_key && provider_key){
+        query_dict = {
+            "_id":ObjectId(station_key),
+            "provider":ObjectId(provider_key)
+        };
+        Station.findOne(query_dict, (err, station)=>{
             if(err || !station){
                 return res.status(404).send({error: 'Station key not found.'});
             }
@@ -30,8 +35,13 @@ exports.get_finger_print = function(req, res, next){
 
 exports.finger_print_login = function(req, res, next){
     var station_key = req.headers['x-station-key'];
+    var provider_key =  req.headers['x-provider-key'];
     var user_key = req.headers['x-user-key']
-    if(station_key && user_key){
+    if(station_key && user_key && provider_key){
+        query_dict = {
+            "_id":ObjectId(station_key),
+            "provider":ObjectId(provider_key)
+        };
         Station.findOne({"_id": ObjectId(station_key)}, (err, station)=>{
             if(err || !station){
                 return res.status(404).send({error: 'Station key not found.'});
