@@ -58,6 +58,9 @@ var UserSchema = new mongoose.Schema({
     firsttime:{
         type:Boolean,
         default:true
+    },
+    first_time_key:{
+        type: String
     }
 },{
         timestamps: true

@@ -46,15 +46,13 @@ exports.finger_print_login = function(req, res, next){
             if(err || !station){
                 return res.status(404).send({error: 'Station key not found.'});
             }
-            console.log(user_key)
-            User.find({'_id': ObjectId(user_key)},{id_card:1, about:1, role:1, firsttime:1}, (error, user)=>{
+            User.find({'_id': ObjectId(user_key)},{id_card:1, firsttime:1, first_time_key:1}, (error, user)=>{
                 if(error){
                     return res.status(500).send({error: error.message});
                 }
                 if(user.length == 0){
                     return res.status(500).send({error: "Cannot find user"});
                 }
-                console.log(user)
 
                 res.status(200).json({
                     token: 'JWT ' + generateToken(user),

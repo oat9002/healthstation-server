@@ -85,18 +85,9 @@ Request body
 Response body
 ```
 {
-    "token": "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "token": "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
     "user": {
-        "_id": {{mongoId}},
-        "thaiFullName": "นาย รัฐภูมิ พุทธรักษา",
-        "engFullName": "Mr.Rattapum Puttaraksa",
-        "birthOfDate": "1990-10-10",
-        "address": {
-            "allow": true,
-            "title": "กรุงเทพ"
-        },
-        "gender": "ชาย",
-        "role": "patient",
+        "_id": "5abf81c2f7439846fff4a20c",
         "firsttime": true
     }
 }
@@ -181,22 +172,19 @@ Response body
     "token": "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "user": {
         "_id": "5ab27a1eb8709a12525f21d9",
-        "thaiFullName": "นาย รัฐภูมิ พุทธรักษา",
-        "engFullName": "Mr.Rattapum Puttaraksa",
-        "birthOfDate": "YYY-MM-DD",
-        "address": {
-            "allow": true,
-            "title": "Bangkok Thailand"
-        },
-        "gender": "ชาย",
-        "role": "patient",
-        "about": {
-            "address2": {
-                "allow": false
-            }
-        },
-        "about_patient": {},
-        "firsttime": true
+        "firstTimeKey": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "firsttime": false,
+        "id_card": {
+            "address": {
+                "allow": true,
+                "title": "46/5 ม.6 ต.หนองชิ่ม อ.แหลมสิงห์ จ.จันทบุรี"
+            },
+            "gender": "ชาย",
+            "idNumber": "1229900625141",
+            "birthOfDate": "1994-12-10T00:00:00.000Z",
+            "engFullName": "Mr.Rattapum Puttaraksa",
+            "thaiFullName": "นาย รัฐภูมิ พุทธรักษา"
+        }
     }
 }
 ```

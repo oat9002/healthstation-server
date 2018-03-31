@@ -6,6 +6,7 @@ var FingerPrint = require('../models/fingerprint');
 var Station = require('../models/station');
 var Provider = require('../models/provider')
 var config = require('../../configs');
+    rand = require('random-key');
 
 function generateToken(user){
     info = {
@@ -37,19 +38,11 @@ exports.login = function(req, res, next){
             res.status(404).send({err:err.message});
                 return next(err);
         }
-        if(req.user.role==="patient"){
-            var userInfo = setPatientInfo(req.user);
-            res.status(200).json({
-                token: 'JWT ' + generateToken(userInfo),
-                user: userInfo
-            });
-        }else if(req.user.role==="doctor"){
-            var userInfo = setDoctorInfo(req.user);
-            res.status(200).json({
-                token: 'JWT ' + generateToken(userInfo),
-                user: userInfo
-            });
-        }
+        var userInfo = getInfoStationLogin(req.user);
+        res.status(200).json({
+            token: 'JWT ' + generateToken(userInfo),
+            data: userInfo
+        });
     })
 }
 
@@ -120,6 +113,7 @@ exports.register = function(req, res, next){ // register ID_CARD
                                 password : ("0" + birth_date.getDate()).slice(-2)+""+("0" + (birth_date.getMonth() + 1)).slice(-2)+""+(birth_date.getFullYear()+543)
                             },
                             firsttime: true,
+                            first_time_key: rand.generate(24),
                             role : info.role
                         });
 
@@ -128,19 +122,11 @@ exports.register = function(req, res, next){ // register ID_CARD
                                 res.status(502).send({error: 'MongoDB cannot connect'});
                                 return next(err);
                             }
-                            if(user.role==="patient"){
-                                var userInfo = getPatientInfoAfterRegister(user);
-                                res.status(201).json({
-                                    token: 'JWT ' + generateToken(userInfo),
-                                    user: userInfo
-                                })
-                            }else{
-                                var userInfo = setDoctorInfo(user);
-                                res.status(201).json({
-                                    token: 'JWT ' + generateToken(userInfo),
-                                    user: userInfo
-                                })
-                            }
+                            var userInfo = getInfoAfterRegister(user);
+                            res.status(201).json({
+                                token: 'JWT ' + generateToken(userInfo),
+                                user: userInfo
+                            })
                         });
                     })
                 }else{
@@ -303,15 +289,18 @@ function setPatientInfo(request){
     };
 }
 
-function getPatientInfoAfterRegister(request){
+function getInfoAfterRegister(request){
     return {
         _id: request._id,
-        thaiFullName : request.id_card.thaiFullName,
-        engFullName : request.id_card.engFullName,
-        birthOfDate : request.id_card.birthOfDate.toLocaleDateString(),
-        address : request.id_card.address,
-        gender: request.id_card.gender,
-        role : request.role,
-        firsttime : request.firsttime,
+        firsttime : request.firsttime
     };
+}
+
+function getInfoStationLogin(request){
+    return{
+        _id: request._id,
+        firstTimeKey: request.first_time_key,
+        firsttime: request.firsttime,
+        id_card : request.id_card
+    }
 }
