@@ -6,80 +6,84 @@ var jwt = require('jsonwebtoken');
 exports.insertData = function (req, res, next) { //save
     var doc = req.body;
     var user_id = req.headers['user_id'];
-    if (!user_id) {
-        return res.status(400).send({
-            error: 'Missing require header'
-        });
-    } else {
-        User.findOne({
-            _id: ObjectId(user_id)
-        }, function (err, existingUser) {
-            var arr = {};
-            if (err) {
-                return res.status(500).send({
-                    error: 'Internal server error due to : ' + err
-                });
-            }
-            if (!existingUser) {
-                return res.status(404).send({
-                    error: 'Cannot find this user.'
-                });
-            }
-            arr = {}
-            arr['uid'] = ObjectId(user_id)
-            arr['date_time'] = doc.effective_time_frame.date_time;
-            if (doc.body_temperature) {
-                arr['h_value'] = doc.body_temperature.value;
-                arr['unit'] = doc.body_temperature.unit;
-                arr['type'] = "temperature";
-            } else if (doc.systolic_blood_pressure && doc.diastolic_blood_pressure) {
-                arr['h_value'] = doc.systolic_blood_pressure.value;
-                arr['l_value'] = doc.diastolic_blood_pressure.value;
-                arr['unit'] = doc.systolic_blood_pressure.unit;
-                arr['type'] = "bloodpressure";
-            } else if (doc.body_weight) {
-                arr['h_value'] = doc.body_weight.value;
-                arr['unit'] = doc.body_weight.unit;
-                arr['type'] = "weight";
-            } else if (doc.body_height) {
-                arr['h_value']= doc.body_height.value;
-                arr['unit']= doc.body_height.unit;
-                arr['type']= "height";
-            } else if (doc.heart_rate) {
-                arr['h_value']= doc.heart_rate.value;
-                arr['unit']= doc.heart_rate.unit;
-                arr['type']= "heartrate";
-            } else {
-                return res.status(400).send({
-                    error: 'Data schema error'
-                });
-            }
-            var data = new Data({
-                uid: arr.uid,
-                h_value: arr.h_value,
-                l_value: arr.l_value,
-                unit: arr.unit,
-                type: arr.type,
-                date_time: arr.date_time
-            })
-            data.save(function (err, data) {
+    try{
+        if (!user_id) {
+            return res.status(400).send({
+                error: 'Missing require header'
+            });
+        } else {
+            User.findOne({
+                _id: ObjectId(user_id)
+            }, function (err, existingUser) {
+                var arr = {};
                 if (err) {
-                    if (err.code == 11000) {
-                        return res.status(406).send({
-                            error: 'Duplicate data'
-                        });
-                    }
                     return res.status(500).send({
                         error: 'Internal server error due to : ' + err
                     });
                 }
-
-                return res.status(201).send({
-                    error: false
+                if (!existingUser) {
+                    return res.status(404).send({
+                        error: 'Cannot find this user.'
+                    });
+                }
+                arr = {}
+                arr['uid'] = ObjectId(user_id)
+                arr['date_time'] = doc.effective_time_frame.date_time;
+                if (doc.body_temperature) {
+                    arr['h_value'] = doc.body_temperature.value;
+                    arr['unit'] = doc.body_temperature.unit;
+                    arr['type'] = "temperature";
+                } else if (doc.systolic_blood_pressure && doc.diastolic_blood_pressure) {
+                    arr['h_value'] = doc.systolic_blood_pressure.value;
+                    arr['l_value'] = doc.diastolic_blood_pressure.value;
+                    arr['unit'] = doc.systolic_blood_pressure.unit;
+                    arr['type'] = "bloodpressure";
+                } else if (doc.body_weight) {
+                    arr['h_value'] = doc.body_weight.value;
+                    arr['unit'] = doc.body_weight.unit;
+                    arr['type'] = "weight";
+                } else if (doc.body_height) {
+                    arr['h_value']= doc.body_height.value;
+                    arr['unit']= doc.body_height.unit;
+                    arr['type']= "height";
+                } else if (doc.heart_rate) {
+                    arr['h_value']= doc.heart_rate.value;
+                    arr['unit']= doc.heart_rate.unit;
+                    arr['type']= "heartrate";
+                } else {
+                    return res.status(400).send({
+                        error: 'Data schema error'
+                    });
+                }
+                var data = new Data({
+                    uid: arr.uid,
+                    h_value: arr.h_value,
+                    l_value: arr.l_value,
+                    unit: arr.unit,
+                    type: arr.type,
+                    date_time: arr.date_time
                 })
+                data.save(function (err, data) {
+                    if (err) {
+                        if (err.code == 11000) {
+                            return res.status(406).send({
+                                error: 'Duplicate data'
+                            });
+                        }
+                        return res.status(500).send({
+                            error: 'Internal server error due to : ' + err
+                        });
+                    }
 
+                    return res.status(201).send({
+                        error: false
+                    })
+
+                });
             });
-        });
+        }
+    }catch(e){
+        return res.status(500).send({error: e.message});
     }
 }
 
@@ -175,124 +179,128 @@ exports.getLatestData = function (req, response, next) { //get latest data of al
             error: 'Missing require header'
         });
     } else {
-        findLatestData(user_id, "heartrate", function (err, docs) {
-            if (err) {
-                return response.status(500).send({
-                    error: 'Internal server error'
-                });
-            }
-            if (docs) {
-                data['heart_rate'] = {
-                    "value": docs.h_value,
-                    "unit": docs.unit
+        try{
+            findLatestData(user_id, "heartrate", function (err, docs) {
+                if (err) {
+                    return response.status(500).send({
+                        error: 'Internal server error'
+                    });
                 }
-                data['effective_time_frame'] = {
-                    "date_time": docs.date_time
+                if (docs) {
+                    data['heart_rate'] = {
+                        "value": docs.h_value,
+                        "unit": docs.unit
+                    }
+                    data['effective_time_frame'] = {
+                        "date_time": docs.date_time
+                    }
+                } else {
+                    count_err++;
                 }
-            } else {
-                count_err++;
-            }
-            remain--;
-            if (remain == 0) {
-                return response.status(200).send(data);
-            }
-        });
-        findLatestData(user_id, "bloodpressure", function (err, docs) {
-            if (err) {
-                return response.status(500).send({
-                    error: 'Internal server error'
-                });
-            }
-            if (docs) {
-                data['systolic_blood_pressure'] = {
-                    "value": docs.h_value,
-                    "unit": docs.unit
+                remain--;
+                if (remain == 0) {
+                    return response.status(200).send(data);
                 }
-                data['diastolic_blood_pressure'] = {
-                    "value": docs.l_value,
-                    "unit": docs.unit
-                }
-                data['effective_time_frame'] = {
-                    "date_time": docs.date_time
-                }
-            } else {
-                count_err++;
-            }
-            remain--;
-            if (remain == 0) {
-                return response.status(200).send(data);
-            }
-        });
-        findLatestData(user_id, "weight", function (err, docs) {
-            if (err) {
-                return response.status(500).send({
-                    error: 'Internal server error'
-                });
-            }
-            if (docs) {
-                data['body_weight'] = {
-                    "value": docs.h_value,
-                    "unit": docs.unit
-                }
-                data['effective_time_frame'] = {
-                    "date_time": docs.date_time
-                }
-            } else {
-                count_err++;
-            }
-            remain--;
-            if (remain == 0) {
-                return response.status(200).send(data);
-            }
-        });
-        findLatestData(user_id, "height", function (err, docs) {
-            if (err) {
-                return response.status(500).send({
-                    error: 'Internal server error'
-                });
-            }
-            if (docs) {
-                data['body_height'] = {
-                    "value": docs.h_value,
-                    "unit": docs.unit
-                }
-                data['effective_time_frame'] = {
-                    "date_time": docs.date_time
-                }
-            } else {
-                count_err++;
-            }
-            remain--;
-            if (remain == 0) {
-                return response.status(200).send(data);
-            }
-        });
-        findLatestData(user_id, "temperature", function (err, docs) {
-            if (err) {
-                return response.status(500).send({
-                    error: 'Internal server error'
-                });
-            }
-            if (docs) {
-                data['body_temperature'] = {
-                    "value": docs.h_value,
-                    "unit": docs.unit
-                }
-                data['effective_time_frame'] = {
-                    "date_time": docs.date_time
-                }
-            } else {
-                count_err++;
-            }
-            remain--;
-            if (remain == 0) {
-                return response.status(200).send(data);
-            }
-        });
-        if (count_err == 5 && remain == 0) {
-            return response.status(404).send({
-                error: "Data not found"
             });
+            findLatestData(user_id, "bloodpressure", function (err, docs) {
+                if (err) {
+                    return response.status(500).send({
+                        error: 'Internal server error'
+                    });
+                }
+                if (docs) {
+                    data['systolic_blood_pressure'] = {
+                        "value": docs.h_value,
+                        "unit": docs.unit
+                    }
+                    data['diastolic_blood_pressure'] = {
+                        "value": docs.l_value,
+                        "unit": docs.unit
+                    }
+                    data['effective_time_frame'] = {
+                        "date_time": docs.date_time
+                    }
+                } else {
+                    count_err++;
+                }
+                remain--;
+                if (remain == 0) {
+                    return response.status(200).send(data);
+                }
+            });
+            findLatestData(user_id, "weight", function (err, docs) {
+                if (err) {
+                    return response.status(500).send({
+                        error: 'Internal server error'
+                    });
+                }
+                if (docs) {
+                    data['body_weight'] = {
+                        "value": docs.h_value,
+                        "unit": docs.unit
+                    }
+                    data['effective_time_frame'] = {
+                        "date_time": docs.date_time
+                    }
+                } else {
+                    count_err++;
+                }
+                remain--;
+                if (remain == 0) {
+                    return response.status(200).send(data);
+                }
+            });
+            findLatestData(user_id, "height", function (err, docs) {
+                if (err) {
+                    return response.status(500).send({
+                        error: 'Internal server error'
+                    });
+                }
+                if (docs) {
+                    data['body_height'] = {
+                        "value": docs.h_value,
+                        "unit": docs.unit
+                    }
+                    data['effective_time_frame'] = {
+                        "date_time": docs.date_time
+                    }
+                } else {
+                    count_err++;
+                }
+                remain--;
+                if (remain == 0) {
+                    return response.status(200).send(data);
+                }
+            });
+            findLatestData(user_id, "temperature", function (err, docs) {
+                if (err) {
+                    return response.status(500).send({
+                        error: 'Internal server error'
+                    });
+                }
+                if (docs) {
+                    data['body_temperature'] = {
+                        "value": docs.h_value,
+                        "unit": docs.unit
+                    }
+                    data['effective_time_frame'] = {
+                        "date_time": docs.date_time
+                    }
+                } else {
+                    count_err++;
+                }
+                remain--;
+                if (remain == 0) {
+                    return response.status(200).send(data);
+                }
+            });
+            if (count_err == 5 && remain == 0) {
+                return response.status(404).send({
+                    error: "Data not found"
+                });
+            }
+        }catch(e){
+            return res.status(500).send({error: e.message});
         }
     }
 }
@@ -306,21 +314,25 @@ exports.findPeriodDataByType = function (req, res, next) { // find 1 data by typ
             error: "Missing require header"
         });
     } else {
-        findDataByPeriod(user_id, type, period, function (err, resp) {
+        try{
+            findDataByPeriod(user_id, type, period, function (err, resp) {
 
-            if (err) {
-                return res.status(500).send({
-                    error: 'Internal server error'
-                });
-            }
-            if (Object.keys(resp).length === 0) {
-                return res.status(404).send({
-                    error: "Can't find any data"
-                });
-            } else {
-                return res.status(200).send(resp);
-            }
-        });
+                if (err) {
+                    return res.status(500).send({
+                        error: 'Internal server error'
+                    });
+                }
+                if (Object.keys(resp).length === 0) {
+                    return res.status(404).send({
+                        error: "Can't find any data"
+                    });
+                } else {
+                    return res.status(200).send(resp);
+                }
+            });
+        }catch(e){
+            return res.status(500).send({error: e.message});
+        }
     }
 }
 
@@ -332,61 +344,65 @@ exports.findLatestDataByType = function (req, res, next) { // find 1 latest data
             error: "Missing require header"
         });
     } else {
-        findLatestData(user_id, type, function (err, docs) {
-            var data = {};
-            if (!docs) {
-                return res.status(404).send({
-                    error: "Can't find any data"
-                });
-            } else {
-                if (docs.type === "heartrate") {
-                    data['heart_rate'] = {
-                        "value": docs.h_value,
-                        "unit": docs.unit
+        try{
+            findLatestData(user_id, type, function (err, docs) {
+                var data = {};
+                if (!docs) {
+                    return res.status(404).send({
+                        error: "Can't find any data"
+                    });
+                } else {
+                    if (docs.type === "heartrate") {
+                        data['heart_rate'] = {
+                            "value": docs.h_value,
+                            "unit": docs.unit
+                        }
+                        data['effective_time_frame'] = {
+                            "date_time": docs.date_time
+                        }
+                    } else if (docs.type === "bloodpressure") {
+                        data['systolic_blood_pressure'] = {
+                            "value": docs.h_value,
+                            "unit": docs.unit
+                        }
+                        data['diastolic_blood_pressure'] = {
+                            "value": docs.l_value,
+                            "unit": docs.unit
+                        }
+                        data['effective_time_frame'] = {
+                            "date_time": docs.date_time
+                        }
+                    } else if (docs.type === "temperature") {
+                        data['body_temperature'] = {
+                            "value": docs.h_value,
+                            "unit": docs.unit
+                        }
+                        data['effective_time_frame'] = {
+                            "date_time": docs.date_time
+                        }
+                    } else if (docs.type === "weight") {
+                        data['body_weight'] = {
+                            "value": docs.h_value,
+                            "unit": docs.unit
+                        }
+                        data['effective_time_frame'] = {
+                            "date_time": docs.date_time
+                        }
+                    } else if (docs.type === "height") {
+                        data['body_height'] = {
+                            "value": docs.h_value,
+                            "unit": docs.unit
+                        }
+                        data['effective_time_frame'] = {
+                            "date_time": docs.date_time
+                        }
                     }
-                    data['effective_time_frame'] = {
-                        "date_time": docs.date_time
-                    }
-                } else if (docs.type === "bloodpressure") {
-                    data['systolic_blood_pressure'] = {
-                        "value": docs.h_value,
-                        "unit": docs.unit
-                    }
-                    data['diastolic_blood_pressure'] = {
-                        "value": docs.l_value,
-                        "unit": docs.unit
-                    }
-                    data['effective_time_frame'] = {
-                        "date_time": docs.date_time
-                    }
-                } else if (docs.type === "temperature") {
-                    data['body_temperature'] = {
-                        "value": docs.h_value,
-                        "unit": docs.unit
-                    }
-                    data['effective_time_frame'] = {
-                        "date_time": docs.date_time
-                    }
-                } else if (docs.type === "weight") {
-                    data['body_weight'] = {
-                        "value": docs.h_value,
-                        "unit": docs.unit
-                    }
-                    data['effective_time_frame'] = {
-                        "date_time": docs.date_time
-                    }
-                } else if (docs.type === "height") {
-                    data['body_height'] = {
-                        "value": docs.h_value,
-                        "unit": docs.unit
-                    }
-                    data['effective_time_frame'] = {
-                        "date_time": docs.date_time
-                    }
+                    return res.status(200).send(data);
                 }
-                return res.status(200).send(data);
-            }
-        });
+            });
+        }catch(e){
+            return res.status(500).send({error: e.message});
+        }
     }
 }
 
