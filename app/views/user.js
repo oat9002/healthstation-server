@@ -22,7 +22,8 @@ function generateToken(user){
 exports.protected = function(req, res, next){
     res.status(200).json({
         role: req.user.role,
-        firsttime: req.user.firsttime
+        firsttime: req.user.firsttime,
+        firstTimeKey: req.user.first_time_key
     });
 }
 
