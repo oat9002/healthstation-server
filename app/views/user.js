@@ -288,7 +288,8 @@ function setDoctorInfo(request){
         role : request.role,
         about : request.about,
         about_doctor : request.about_doctor,
-        firsttime : request.firsttime
+        firsttime : request.firsttime,
+        firstTimeKey: request.first_time_key,
     };
 }
 function setPatientInfo(request){
@@ -303,6 +304,7 @@ function setPatientInfo(request){
         about : request.about,
         about_patient : request.about_patient,
         firsttime : request.firsttime,
+        firstTimeKey: request.first_time_key,
     };
 }
 
