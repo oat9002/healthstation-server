@@ -16,9 +16,9 @@ services:
         container_name: "mongodb"
         environment:
           - MONGO_DATA_DIR=/data/db
-          - MONGO_LOG_DIR=/dev/null
+          - MONGO_LOG_DIR=/dev/logs
         volumes:
           - ./data/db:/data/db
         ports:
-            - 27017:27017
-        command: mongod --smallfiles --logpath=/dev/null # --quiet
+            - 27017:27018
+        command: mongod --smallfiles --logpath=/dev/logs # --quiet
