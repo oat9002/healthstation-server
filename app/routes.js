@@ -1,9 +1,11 @@
-var passportService = require('./middlewares/passport'),
-    StationController = require('./views/station')
-    DataController = require('./views/healthData');
-    UserController = require('./views/user')
-    FingerprintView = require('./views/fingerPrint')
-    ProviderAuthenController = require('./views/provider')
+var passportService = require('./utils/passport'),
+    StationController = require('./views/station'),
+    DataController = require('./views/healthData'),
+    UserController = require('./views/user'),
+    FingerprintView = require('./views/fingerPrint'),
+    ProviderAuthenController = require('./views/provider'),
+    logging = require('./utils/logging');
+var logger = logging.get_logger("api");
 
     express = require('express'),
     passport = require('passport');

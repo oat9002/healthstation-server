@@ -163,9 +163,9 @@ passport.use('basicLogin', basicLogin);
 //     passport.use(new FacebookStrategy({
 
 //         // pull in our app id and secret from our auth.js file
-//         clientID        : configAuth.facebookAuth.clientID,
-//         clientSecret    : configAuth.facebookAuth.clientSecret,
-//         callbackURL     : configAuth.facebookAuth.callbackURL
+//         client_id        : configAuth.facebook_auth.client_id,
+//         client_secret    : configAuth.facebook_auth.client_secret,
+//         callback_url     : configAuth.facebook_auth.callback_url
 
 //     },
 

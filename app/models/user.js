@@ -70,7 +70,7 @@ module.exports = mongoose.model('user', UserSchema);
 
 UserSchema.pre('save', function (next) {
     var user = this;
-    bcrypt.hash(user.authentication.password, configs.hashSalt, function (err, hash){
+    bcrypt.hash(user.authentication.password, configs.hashsalt, function (err, hash){
       if (err) {
         return next(err);
       }

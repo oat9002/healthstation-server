@@ -7,4 +7,5 @@ services:
             - 8080:8080
         volumes:
             - .:/app
+            - /var/logs:/var/logs
         network_mode: "host"
