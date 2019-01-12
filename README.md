@@ -20,7 +20,7 @@ Header
 Request body
 ```
 {
-	"name" : "KMITL",
+    "name" : "KMITL",
     "address" : "ABC",
     "phone" : "08x-xxxxxxx",
     "fax" : "08x-xxxxxxx",
@@ -59,8 +59,8 @@ Response body
 }
 ```
 
-**Register user by idcard:**
-POST /api/auth/register/card
+**Register user:**
+POST /api/auth/register/
 
 Header
 ```
@@ -78,7 +78,8 @@ Request body
     "thaiFullName" : "นาย รัฐภูมิ พุทธรักษา",
     "engFullName" : "Mr.Rattapum Puttaraksa",
     "address" : "46/5 ม.6 ต.หนองชิ่ม อ.แหลมสิงห์ จ.จันทบุรี",
-    "role": 'doctor'
+    "role": 'doctor',
+    "fingerPrint": [""]
 }
 ```
 
@@ -93,36 +94,7 @@ Response body
 }
 ```
 
-**Register user fingerprint:**
-POST /api/auth/register/fingerprint
-
-Header
-```
-    Authorization: Basic Authen of provider username and password
-    X-Station-Key: {{station_key}}
-    X-Provider-Key: {{PROVIDER_KEY}}
-```
-
-Request body
-```
-{
-  "userId" : "5ab27a1eb8709a12525f21d9",
-  "fingerPrint": [
-	"ASDIJOIHUB123ONFIAN",
-	"ASNFINFAIFAIPFSN312",
-	"ASDPIAHIWONINOWUENU"
-  ]
-}
-```
-
-Response body
-```
-{
-    "error": false
-}
-```
-
-**Get user fingerprint:**
+**Get fingerprint list:**
 GET /api/data/fingerprint
 
 Header
