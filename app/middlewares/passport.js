@@ -73,7 +73,7 @@ var providerBasicLogin = new BasicStrategy(basicOptions, function(req, username,
 });
 
 var jwtOptions = {
-    jwtFromRequest: ExtractJwt.fromAuthHeader(),
+    jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("jwt"),
     secretOrKey: config.secret
 };
 
