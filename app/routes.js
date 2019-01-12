@@ -29,7 +29,7 @@ module.exports = function(app){
     authRoutes.post('/register/provider', ProviderAuthenController.provider_register);
     // Public use
     authRoutes.post('/register/station', requireProviderLoginBasic, StationController.register_station);
-    authRoutes.post('/register/card', UserController.register);
+    authRoutes.post('/register/', UserController.register);
     authRoutes.post('/register/fingerprint', FingerprintView.register_finger_print);
     authRoutes.get('/login/fingerprint', FingerprintView.finger_print_login);
     authRoutes.get('/login', requireStationLoginBasic, UserController.login);
