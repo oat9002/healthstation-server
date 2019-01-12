@@ -76,57 +76,72 @@ exports.register = function(req, res, next){ // register ID_CARD
     var station_key = req.headers['x-station-key'];
     var provider_key =  req.headers['x-provider-key'];
     var idNumber = info.idNumber;
+    var finger_print = info.fingerPrint
     if(!idNumber){
         return res.status(422).send({error: 'Missing Id number'});
     }
+    if(!finger_print){
+        return res.status(422).send({error: 'Missing fingerPrint'});
+    }
+    if(!station_key || !provider_key){
+        return res.status(400).send({error: 'Missing require header(s).'});
+    }
     try{
-        if(station_key && provider_key){
-            query_dict = {
-                "_id":ObjectId(station_key),
-                "provider":ObjectId(provider_key)
-            };
-            Station.findOne(query_dict, (err, station)=>{
-                if(err){
-                    res.status(400).send({err:err.message});
-                        return next(err);
-                }
+        query_dict = {
+            "_id":ObjectId(station_key),
+            "provider":ObjectId(provider_key)
+        };
+        Station.findOne(query_dict, (err, station)=>{
+            if(err){
+                res.status(404).send({err:err.message});
+                    return next(err);
+            }
 
-                if(station){
-                    if(info.thaiFullName && info.engFullName && info.birthOfDate && info.address && info.idNumber && info.gender){
-                        User.findOne({"id_card.idNumber": idNumber}, function(err, existingUser){
+            if(station){
+                if(info.thaiFullName && info.engFullName && info.birthOfDate && info.address && info.idNumber && info.gender){
+                    User.findOne({"id_card.idNumber": idNumber}, function(err, existingUser){
 
+                        if(err){
+                            res.status(404).send({err:'MongoDB cannot find this user'});
+                            return next(err);
+                        }
+                        if(existingUser){
+                            res.status(409).send({error: 'this id number is already exist'});
+                            return next(err);
+                        }
+                        birth_date = new Date(info.birthOfDate);
+                        birth_date.setFullYear(birth_date.getFullYear()-543)
+                        var user = new User({
+                            id_card:{
+                                thaiFullName : info.thaiFullName,
+                                engFullName : info.engFullName,
+                                birthOfDate : birth_date,
+                                address : {
+                                    title: info.address,
+                                },
+                                idNumber : info.idNumber,
+                                gender: info.gender
+                            },
+                            authentication:{
+                                username : info.idNumber,
+                                password : ("0" + birth_date.getDate()).slice(-2)+""+("0" + (birth_date.getMonth() + 1)).slice(-2)+""+(birth_date.getFullYear()+543)
+                            },
+                            firsttime: true,
+                            first_time_key: rand.generate(24),
+                            role : info.role
+                        });
+
+                        user.save(function(err, user){
                             if(err){
-                                res.status(404).send({err:'MongoDB cannot find this user'});
+                                res.status(409).send({error: 'MongoDB cannot connect'});
                                 return next(err);
                             }
-                            if(existingUser){
-                                res.status(409).send({error: 'this id number is already exist'});
-                                return next(err);
-                            }
-                            birth_date = new Date(info.birthOfDate);
-                            birth_date.setFullYear(birth_date.getFullYear()-543)
-                            var user = new User({
-                                id_card:{
-                                    thaiFullName : info.thaiFullName,
-                                    engFullName : info.engFullName,
-                                    birthOfDate : birth_date,
-                                    address : {
-                                        title: info.address,
-                                    },
-                                    idNumber : info.idNumber,
-                                    gender: info.gender
-                                },
-                                authentication:{
-                                    username : info.idNumber,
-                                    password : ("0" + birth_date.getDate()).slice(-2)+""+("0" + (birth_date.getMonth() + 1)).slice(-2)+""+(birth_date.getFullYear()+543)
-                                },
-                                firsttime: true,
-                                first_time_key: rand.generate(24),
-                                role : info.role
-                            });
-
-                            user.save(function(err, user){
-                                if(err){
+                            var finger_print = new FingerPrint({
+                                finger_print: info.fingerPrint,
+                                user: user._id
+                            })
+                            finger_print.save((error, finger_print) => {
+                                if(error){
                                     res.status(409).send({error: 'MongoDB cannot connect'});
                                     return next(err);
                                 }
@@ -135,18 +150,16 @@ exports.register = function(req, res, next){ // register ID_CARD
                                     token: 'JWT ' + generateToken(userInfo),
                                     user: userInfo
                                 })
-                            });
-                        })
-                    }else{
-                        return res.status(400).send({error : 'Missing field in json'});
-                    }
+                            })
+                        });
+                    })
                 }else{
-                    return res.status(404).send({error: 'Cannot find station'});
+                    return res.status(400).send({error : 'Missing field in json'});
                 }
-            })
-        }else{
-            return res.status(400).send({error: 'Missing require header(s).'});
-        }
+            }else{
+                return res.status(404).send({error: 'Cannot find station'});
+            }
+        })
     }catch(e){
         return res.status(500).send({error: e.message});
     }
