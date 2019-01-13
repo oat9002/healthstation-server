@@ -1,7 +1,6 @@
-var Data = require('../models/healthdata');
-var User = require('../models/user');
+var Data = require('./models');
+var User = require('../user/models/user');
 var ObjectId = require('mongodb').ObjectID;
-var jwt = require('jsonwebtoken');
 
 exports.insertData = function (req, res, next) { //save
     var doc = req.body;

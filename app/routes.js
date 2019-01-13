@@ -1,9 +1,9 @@
 var passportService = require('./utils/passport'),
-    StationController = require('./views/station'),
-    DataController = require('./views/healthData'),
-    UserController = require('./views/user'),
-    FingerprintView = require('./views/fingerPrint'),
-    ProviderAuthenController = require('./views/provider'),
+    StationView = require('./station/views'),
+    DataView = require('./health_data/views'),
+    UserView = require('./user/views'),
+    FingerprintView = require('./finger_print/views'),
+    ProviderAuthenController = require('./provider/views'),
     logging = require('./utils/logging');
 var logger = logging.get_logger("api");
 
@@ -30,27 +30,27 @@ module.exports = function(app){
     // Internal use
     authRoutes.post('/register/provider', ProviderAuthenController.provider_register);
     // Public use
-    authRoutes.post('/register/station', requireProviderLoginBasic, StationController.register_station);
-    authRoutes.post('/register/', UserController.register);
+    authRoutes.post('/register/station', requireProviderLoginBasic, StationView.register_station);
+    authRoutes.post('/register/', UserView.register);
     authRoutes.post('/register/fingerprint', FingerprintView.register_finger_print);
     authRoutes.get('/login/fingerprint', FingerprintView.finger_print_login);
-    authRoutes.get('/login', requireStationLoginBasic, UserController.login);
-    authRoutes.get('/login/mobile', requireLoginBasic, UserController.mobile_login)
-    authRoutes.put('/firsttimeupdate', requireAuth, UserController.firsttimeChanged);
-    authRoutes.get('/protected', requireAuth, UserController.protected);
+    authRoutes.get('/login', requireStationLoginBasic, UserView.login);
+    authRoutes.get('/login/mobile', requireLoginBasic, UserView.mobile_login)
+    authRoutes.put('/firsttimeupdate', requireAuth, UserView.firsttimeChanged);
+    authRoutes.get('/protected', requireAuth, UserView.protected);
 
     // Data Routes
     apiRoutes.use('/data', dataRoutes);
 
-    dataRoutes.get('/allLatest', DataController.getLatestData);
-    dataRoutes.get('/period', requireAuth, DataController.findPeriodDataByType);
-    dataRoutes.get('/latest', requireAuth, DataController.findLatestDataByType);
-    dataRoutes.post('/save', DataController.insertData);
+    dataRoutes.get('/allLatest', DataView.getLatestData);
+    dataRoutes.get('/period', requireAuth, DataView.findPeriodDataByType);
+    dataRoutes.get('/latest', requireAuth, DataView.findLatestDataByType);
+    dataRoutes.post('/save', DataView.insertData);
 
     dataRoutes.get('/fingerprint', FingerprintView.get_finger_print);
 
     apiRoutes.use('/user', userRoutes);
-    userRoutes.put('/updateprofile', requireAuth, UserController.profileChanging);
+    userRoutes.put('/updateprofile', requireAuth, UserView.profileChanging);
 
     app.use('/api', apiRoutes);
 

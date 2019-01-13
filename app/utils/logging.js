@@ -11,7 +11,7 @@ exports.get_logger = function(log_module){
     if(LOG_MODULES.indexOf(log_module) === -1){
         log_module = "default";
     }
-    console.log(LOG_PATH)
+
     return winston.createLogger({
         level: 'info',
         format: winston.format.combine(

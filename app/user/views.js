@@ -1,10 +1,9 @@
 var jwt = require('jsonwebtoken');
 var ObjectId = require('mongodb').ObjectID;
-var User = require('../models/user');
-var Username = require('../models/username');
-var FingerPrint = require('../models/fingerprint');
-var Station = require('../models/station');
-var Provider = require('../models/provider')
+var User = require('./models/user');
+var Username = require('./models/username');
+var FingerPrint = require('../finger_print/models');
+var Station = require('../station/models');
 var config = require('../../configs');
     rand = require('random-key');
 

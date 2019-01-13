@@ -24,7 +24,7 @@ router(app);
 
 // Global unhandle exception
 process.on('uncaughtException', function (err) {
-    logger.error('Caught exception: ', err);
+    logger.error(`Caught unhandled exception: ${err.message}`);
 });
 
 // Start app

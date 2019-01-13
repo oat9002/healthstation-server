@@ -1,9 +1,6 @@
-var Data = require('../models/healthdata');
-var User = require('../models/user');
-var Provider = require('../models/provider');
-var Username = require('../models/username');
+var Provider = require('../provider/models');
+var Username = require('../user/models/username');
 var ObjectId = require('mongodb').ObjectID;
-var jwt = require('jsonwebtoken');
 
 exports.provider_register = function(req, res, next){
     var body = req.body;

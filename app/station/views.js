@@ -1,11 +1,6 @@
-var jwt = require('jsonwebtoken');
 var ObjectId = require('mongodb').ObjectID;
-var User = require('../models/user');
-var Username = require('../models/username');
-var FingerPrint = require('../models/fingerprint');
-var Station = require('../models/station');
-var Provider = require('../models/provider')
-var config = require('../../configs');
+var Station = require('../station/models');
+var Provider = require('../provider/models')
 
 exports.register_station = function(req, res, next){
     var provider_id =  req.headers['x-provider-key'];
