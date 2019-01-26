@@ -324,7 +324,8 @@ function setPatientInfo(request){
 function getInfoAfterRegister(request){
     return {
         _id: request._id,
-        firsttime : request.firsttime
+        firsttime : request.firsttime,
+        firstTimeKey: request.first_time_key,
     };
 }
 
