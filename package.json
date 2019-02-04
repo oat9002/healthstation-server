@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test" : "nodemon server.js"
+    "test": "nodemon server.js"
   },
   "author": "Rattapum Puttaraksa <chok.puttaraksa@gmail.com>",
   "license": "ISC",
@@ -14,12 +14,16 @@
     "body-parser": "^1.15.2",
     "cors": "^2.8.1",
     "express": "^4.14.0",
-    "jsonwebtoken": "^7.1.9",
-    "mongoose": "^4.6.3",
-    "morgan": "^1.7.0",
+    "jsonschema": "^1.2.4",
+    "jsonwebtoken": "^8.4.0",
+    "mongoose": "^5.4.3",
+    "nodemon": "^1.17.2",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
-    "passport-jwt": "^2.1.0",
-    "passport-local": "^1.0.0"
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "random-key": "^0.3.2",
+    "winston": "^3.0.0",
+    "winston-daily-rotate-file": "^3.5.2"
   }
 }
